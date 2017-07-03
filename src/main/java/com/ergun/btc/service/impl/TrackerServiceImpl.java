@@ -32,7 +32,7 @@ public class TrackerServiceImpl implements TrackerService {
     private static final NumberFormat TRY_FORMATTER = NumberFormat.getInstance();
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
-    @Scheduled(fixedRate = 5000)
+    @Scheduled(fixedRate = 300000)
     public void scheduledRuns() throws IOException, ParseException {
         this.runTracker();
     }
