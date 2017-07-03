@@ -44,8 +44,6 @@ public class TrackerServiceImpl implements TrackerService {
         Price btcturkValue = getBtcturkValue();
         Double tryUsd = getTryUsdValue();
 
-        LOGGER.info("Bitstamp -> {}, Btcturk -> {}, USD/TRY -> {}", bitstampValue, btcturkValue, tryUsd);
-
         Arbitrage arbitrage = new Arbitrage(bitstampValue,btcturkValue,tryUsd);
         this.calculateSyntheticFields(arbitrage);
 
