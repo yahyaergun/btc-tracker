@@ -92,7 +92,7 @@ public class TrackerServiceImpl implements TrackerService {
 
     private Double calculateProfit(Arbitrage arbitrage){
         Double bitstampTryValue = arbitrage.getBitstampPrice().getAmount() * arbitrage.getTryUsd();
-        return arbitrage.getBtcturkPrice().getAmount() - bitstampTryValue;
+        return bitstampTryValue - arbitrage.getBtcturkPrice().getAmount();
     }
 
     private Double calculateNetProfit(Arbitrage arbitrage){
