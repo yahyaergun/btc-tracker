@@ -1,17 +1,37 @@
 package com.ergun.btc.model;
 
+import org.springframework.data.annotation.Id;
+
+import java.util.Date;
+
 public class Arbitrage {
+
+    @Id
+    private String id;
+
     private Price bitstampPrice;
     private Price btcturkPrice;
     private Double tryUsd;
     private Double rawPercentage;
     private Double profit;
     private Double netProfit;
+    private Date date;
+
+    public Arbitrage(){}
 
     public Arbitrage(Price bitstampPrice, Price btcturkPrice, Double tryUsd) {
         this.bitstampPrice = bitstampPrice;
         this.btcturkPrice = btcturkPrice;
         this.tryUsd = tryUsd;
+        date = new Date();
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Double getTryUsd() {
@@ -62,6 +82,14 @@ public class Arbitrage {
         this.netProfit = netProfit;
     }
 
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
+
     @Override
     public String toString() {
         return "Arbitrage{" +
@@ -71,6 +99,7 @@ public class Arbitrage {
                 ", rawPercentage=" + rawPercentage +
                 ", profit=" + profit +
                 ", netProfit=" + netProfit +
+                ", date=" + date +
                 '}';
     }
 }

@@ -19,9 +19,9 @@ public class TrackerController {
     private TrackerService trackerService;
 
     @RequestMapping("/")
-    public void home(){
+    public String home(){
         try {
-            trackerService.runTracker();
+            return trackerService.runTracker().toString();
         } catch (ParseException | IOException e) {
             LOGGER.error("Error on tracker service, details: {}",e);
             throw new RuntimeException(e);

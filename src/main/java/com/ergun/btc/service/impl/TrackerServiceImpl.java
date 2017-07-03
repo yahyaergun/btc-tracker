@@ -1,6 +1,7 @@
 package com.ergun.btc.service.impl;
 
 import com.ergun.btc.Constants;
+import com.ergun.btc.dao.ArbitrageDao;
 import com.ergun.btc.model.Arbitrage;
 import com.ergun.btc.model.Currency;
 import com.ergun.btc.model.Price;
@@ -13,6 +14,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -22,13 +25,20 @@ import java.text.ParseException;
 @Service
 public class TrackerServiceImpl implements TrackerService {
 
+    @Autowired
+    private ArbitrageDao arbitrageDao;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(TrackerServiceImpl.class);
     private static final NumberFormat TRY_FORMATTER = NumberFormat.getInstance();
-
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
+    @Scheduled(fixedRate = 5000)
+    public void scheduledRuns() throws IOException, ParseException {
+        this.runTracker();
+    }
+
     @Override
-    public void runTracker() throws IOException, ParseException {
+    public Arbitrage runTracker() throws IOException, ParseException {
 
         Price bitstampValue = getBitstampValue();
         Price btcturkValue = getBtcturkValue();
@@ -40,6 +50,9 @@ public class TrackerServiceImpl implements TrackerService {
         this.calculateSyntheticFields(arbitrage);
 
         LOGGER.info("Arbitrage -> {}", arbitrage);
+        arbitrageDao.save(arbitrage);
+
+        return arbitrage;
     }
 
     private Price getBitstampValue() throws IOException, ParseException {
