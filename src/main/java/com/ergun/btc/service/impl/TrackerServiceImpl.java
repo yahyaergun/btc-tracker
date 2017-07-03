@@ -1,11 +1,13 @@
 package com.ergun.btc.service.impl;
 
 import com.ergun.btc.Constants;
+import com.ergun.btc.model.Arbitrage;
 import com.ergun.btc.model.Currency;
 import com.ergun.btc.model.Price;
 import com.ergun.btc.service.TrackerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.apache.tomcat.util.bcel.Const;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -26,14 +28,18 @@ public class TrackerServiceImpl implements TrackerService {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @Override
-    public void runTracker() {
-        try {
-            Price bitstampValue = getBitstampValue();
-            Price btcturkValue = getBtcturkValue();
-            LOGGER.info("Bitstamp -> {}, Btcturk -> {}", bitstampValue, btcturkValue);
-        } catch (Exception e){
-            LOGGER.error("Could not get bitcoin prices, reason: {}", e.getLocalizedMessage());
-        }
+    public void runTracker() throws IOException, ParseException {
+
+        Price bitstampValue = getBitstampValue();
+        Price btcturkValue = getBtcturkValue();
+        Double tryUsd = getTryUsdValue();
+
+        LOGGER.info("Bitstamp -> {}, Btcturk -> {}, USD/TRY -> {}", bitstampValue, btcturkValue, tryUsd);
+
+        Arbitrage arbitrage = new Arbitrage(bitstampValue,btcturkValue,tryUsd);
+        this.calculateSyntheticFields(arbitrage);
+
+        LOGGER.info("Arbitrage -> {}", arbitrage);
     }
 
     private Price getBitstampValue() throws IOException, ParseException {
@@ -50,6 +56,40 @@ public class TrackerServiceImpl implements TrackerService {
 
         Number amount = TRY_FORMATTER.parse(priceElement.text());
         return new Price(amount.doubleValue(), Currency.TRY);
+    }
+
+    private Double getTryUsdValue() throws IOException, ParseException {
+        String json = Jsoup.connect(Constants.DOVIZ_URL).ignoreContentType(true).execute().body();
+        ObjectNode nodes = MAPPER.readValue(json, ObjectNode.class);
+        String usdSellPrice = nodes.get("selling").asText();
+
+        Number amount = TRY_FORMATTER.parse(usdSellPrice);
+        return amount.doubleValue();
+    }
+
+    private void calculateSyntheticFields(Arbitrage arbitrage) {
+        arbitrage.setProfit(calculateProfit(arbitrage));
+        arbitrage.setNetProfit(calculateNetProfit(arbitrage));
+        arbitrage.setRawPercentage(calculateRawPercentage(arbitrage));
+    }
+
+    private Double calculateRawPercentage(Arbitrage arbitrage) {
+        return arbitrage.getProfit() / arbitrage.getBtcturkPrice().getAmount();
+    }
+
+    private Double calculateProfit(Arbitrage arbitrage){
+        Double bitstampTryValue = arbitrage.getBitstampPrice().getAmount() * arbitrage.getTryUsd();
+        return arbitrage.getBtcturkPrice().getAmount() - bitstampTryValue;
+    }
+
+    private Double calculateNetProfit(Arbitrage arbitrage){
+        Double val = arbitrage.getBitstampPrice().getAmount() * (1 - Constants.BITSTAMP_BTC_USD_FEE_PERC);
+        val *= (1 - Constants.BITSTAMP_DEPOSIT_FEE_PERC);
+        val *= arbitrage.getTryUsd();
+        val *= (1 - Constants.BTCTURK_TAKER_FEE_PERC);
+        val -= Constants.YKB_SWIFT_COST.getAmount();
+
+        return val - arbitrage.getBtcturkPrice().getAmount();
     }
 
 
