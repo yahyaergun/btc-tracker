@@ -87,7 +87,7 @@ public class TrackerServiceImpl implements TrackerService {
     }
 
     private Double calculateRawPercentage(Arbitrage arbitrage) {
-        return arbitrage.getProfit() / arbitrage.getBtcturkPrice().getAmount();
+        return (arbitrage.getProfit() / (arbitrage.getBitstampPrice().getAmount() * arbitrage.getTryUsd())) * 100;
     }
 
     private Double calculateProfit(Arbitrage arbitrage){
