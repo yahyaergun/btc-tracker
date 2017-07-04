@@ -14,7 +14,7 @@ public class Arbitrage {
     private Price bitstampPrice;
     private Price btcturkPrice;
     private Double tryUsd;
-    private Double rawPercentage;
+    private Double profitPercentage;
     private Double profit;
     private Double netProfit;
     private Date date;
@@ -60,12 +60,12 @@ public class Arbitrage {
         this.btcturkPrice = btcturkPrice;
     }
 
-    public Double getRawPercentage() {
-        return rawPercentage;
+    public Double getProfitPercentage() {
+        return profitPercentage;
     }
 
-    public void setRawPercentage(Double rawPercentage) {
-        this.rawPercentage = rawPercentage;
+    public void setProfitPercentage(Double profitPercentage) {
+        this.profitPercentage = profitPercentage;
     }
 
     public Double getProfit() {
@@ -98,7 +98,7 @@ public class Arbitrage {
                 "bitstampPrice=" + bitstampPrice +
                 ", btcturkPrice=" + btcturkPrice +
                 ", tryUsd=" + tryUsd +
-                ", rawPercentage=" + rawPercentage +
+                ", profitPercentage=" + profitPercentage +
                 ", profit=" + profit +
                 ", netProfit=" + netProfit +
                 ", date=" + date +
@@ -117,7 +117,7 @@ public class Arbitrage {
         sb.append("<tbody><tr>");
         sb.append("<td>").append(formatter.format(this.profit)).append(" TL </td>");
         sb.append("<td>").append(formatter.format(this.netProfit)).append(" TL </td>");
-        sb.append("<td>%").append(formatter.format(this.rawPercentage)).append("</td>");
+        sb.append("<td>%").append(formatter.format(this.profitPercentage)).append("</td>");
         sb.append("<td>$ ").append(this.bitstampPrice.getAmount()).append("</td>");
         sb.append("<td>").append(this.btcturkPrice.getAmount()).append(" TL </td>");
         sb.append("<td>").append(this.tryUsd).append("</td>");

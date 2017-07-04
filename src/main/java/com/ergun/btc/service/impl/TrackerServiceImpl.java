@@ -8,7 +8,6 @@ import com.ergun.btc.model.Price;
 import com.ergun.btc.service.TrackerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import org.apache.tomcat.util.bcel.Const;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -81,11 +80,11 @@ public class TrackerServiceImpl implements TrackerService {
     private void calculateSyntheticFields(Arbitrage arbitrage) {
         arbitrage.setProfit(calculateProfit(arbitrage));
         arbitrage.setNetProfit(calculateNetProfit(arbitrage));
-        arbitrage.setRawPercentage(calculateRawPercentage(arbitrage));
+        arbitrage.setProfitPercentage(calculatePercentage(arbitrage));
     }
 
-    private Double calculateRawPercentage(Arbitrage arbitrage) {
-        return (arbitrage.getProfit() / (arbitrage.getBitstampPrice().getAmount() * arbitrage.getTryUsd())) * 100;
+    private Double calculatePercentage(Arbitrage arbitrage) {
+        return (arbitrage.getNetProfit() / (arbitrage.getBitstampPrice().getAmount() * arbitrage.getTryUsd())) * 100;
     }
 
     private Double calculateProfit(Arbitrage arbitrage){
