@@ -113,7 +113,7 @@ public class Arbitrage {
         sb.append("<body>");
         sb.append("<p><h3>Current Arbitrage</h3></p>");
 
-        sb.append("<table border=1><thead><tr><td>Profit</td><td>Net Profit</td><td>Net Profit Percentage</td><td>Bitstamp Price</td><td>Btcturk Price</td><td>Dolar/TL</td><td>Date</td></tr></thead>");
+        sb.append("<table border=1><thead style=\"font-weight:bold;\"><tr><td>Profit</td><td>Net Profit</td><td>Net Profit Percentage</td><td>Bitstamp Price</td><td>Btcturk Price</td><td>Dolar/TL</td><td>Date</td></tr></thead>");
         sb.append("<tbody><tr>");
         sb.append("<td>").append(formatter.format(this.profit)).append(" TL </td>");
         sb.append("<td>").append(formatter.format(this.netProfit)).append(" TL </td>");
