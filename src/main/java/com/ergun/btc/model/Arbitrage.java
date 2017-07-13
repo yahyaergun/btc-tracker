@@ -117,6 +117,8 @@ public class Arbitrage {
         StringBuilder sb = new StringBuilder();
 
         sb.append("<html>");
+        sb.append("<head>");
+        sb.append("<title>btc tracker</title></head>\n");
         sb.append("<body>");
         sb.append("<p><h3>Current Arbitrage</h3></p>");
 
