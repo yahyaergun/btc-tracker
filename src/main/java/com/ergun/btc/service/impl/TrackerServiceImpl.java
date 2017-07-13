@@ -41,9 +41,11 @@ public class TrackerServiceImpl implements TrackerService {
 
         Price bitstampValue = getBitstampValue();
         Price btcturkValue = getBtcturkValue();
+        Price koinimValue = getKoinimValue();
+        Price paribuValue = getParibuValue();
         Double tryUsd = getTryUsdValue();
 
-        Arbitrage arbitrage = new Arbitrage(bitstampValue,btcturkValue,tryUsd);
+        Arbitrage arbitrage = new Arbitrage(bitstampValue,btcturkValue,koinimValue, paribuValue, tryUsd);
         this.calculateSyntheticFields(arbitrage);
 
         LOGGER.info("Arbitrage -> {}", arbitrage);
@@ -68,6 +70,24 @@ public class TrackerServiceImpl implements TrackerService {
         return new Price(amount.doubleValue(), Currency.TRY);
     }
 
+    private Price getKoinimValue() throws IOException, ParseException {
+        String json = Jsoup.connect(Constants.KOINIM_URL).ignoreContentType(true).execute().body();
+        ObjectNode nodes = MAPPER.readValue(json, ObjectNode.class);
+        String lastPrice = nodes.get("sell").asText();
+
+        Number amount = TRY_FORMATTER.parse(lastPrice);
+        return new Price(amount.doubleValue(), Currency.TRY);
+    }
+
+    private Price getParibuValue() throws IOException, ParseException {
+        String json = Jsoup.connect(Constants.PARIBU_URL).userAgent("Mozilla").ignoreContentType(true).execute().body();
+        ObjectNode nodes = MAPPER.readValue(json, ObjectNode.class);
+        String lastPrice = nodes.get("publicState").get("market_sum").get("day_stats").get("bid").asText();
+
+        Number amount = TRY_FORMATTER.parse(lastPrice);
+        return new Price(amount.doubleValue(), Currency.TRY);
+    }
+
     private Double getTryUsdValue() throws IOException, ParseException {
         String json = Jsoup.connect(Constants.DOVIZ_URL).ignoreContentType(true).execute().body();
         ObjectNode nodes = MAPPER.readValue(json, ObjectNode.class);
@@ -78,28 +98,23 @@ public class TrackerServiceImpl implements TrackerService {
     }
 
     private void calculateSyntheticFields(Arbitrage arbitrage) {
-        arbitrage.setProfit(calculateProfit(arbitrage));
-        arbitrage.setNetProfit(calculateNetProfit(arbitrage));
-        arbitrage.setProfitPercentage(calculatePercentage(arbitrage));
+        arbitrage.setBtcturkProfit(calculateBtcturkProfit(arbitrage));
+        arbitrage.setKoinimProfit(calculateKoinimProfit(arbitrage));
+        arbitrage.setParibuProfit((calculateParibuProfit(arbitrage)));
+    }
+    private Double calculateBtcturkProfit(Arbitrage arbitrage){
+        Double value = arbitrage.getBitstampPrice().getAmount() * arbitrage.getTryUsd();
+        return arbitrage.getBtcturkPrice().getAmount() - value;
     }
 
-    private Double calculatePercentage(Arbitrage arbitrage) {
-        return (arbitrage.getNetProfit() / (arbitrage.getBitstampPrice().getAmount() * arbitrage.getTryUsd())) * 100;
+    private Double calculateKoinimProfit(Arbitrage arbitrage){
+        Double value = arbitrage.getBitstampPrice().getAmount() * arbitrage.getTryUsd();
+        return arbitrage.getKoinimPrice().getAmount() - value;
     }
 
-    private Double calculateProfit(Arbitrage arbitrage){
-        Double bitstampTryValue = arbitrage.getBitstampPrice().getAmount() * arbitrage.getTryUsd();
-        return bitstampTryValue - arbitrage.getBtcturkPrice().getAmount();
-    }
-
-    private Double calculateNetProfit(Arbitrage arbitrage){
-        Double val = arbitrage.getBitstampPrice().getAmount() * (1 - Constants.BITSTAMP_BTC_USD_FEE_PERC);
-        val *= (1 - Constants.BITSTAMP_DEPOSIT_FEE_PERC);
-        val *= arbitrage.getTryUsd();
-        val *= (1 - Constants.BTCTURK_TAKER_FEE_PERC);
-        val -= Constants.YKB_SWIFT_COST.getAmount();
-
-        return val - arbitrage.getBtcturkPrice().getAmount();
+    private Double calculateParibuProfit(Arbitrage arbitrage){
+        Double value = arbitrage.getBitstampPrice().getAmount() * arbitrage.getTryUsd();
+        return arbitrage.getParibuPrice().getAmount() - value;
     }
 
 
