@@ -71,7 +71,7 @@ public class TrackerServiceImpl implements TrackerService {
     }
 
     private Price getKoinimValue() throws IOException, ParseException {
-        String json = Jsoup.connect(Constants.KOINIM_URL).ignoreContentType(true).execute().body();
+        String json = Jsoup.connect(Constants.KOINIM_URL).userAgent("Mozilla").ignoreContentType(true).execute().body();
         ObjectNode nodes = MAPPER.readValue(json, ObjectNode.class);
         String lastPrice = nodes.get("sell").asText();
 
