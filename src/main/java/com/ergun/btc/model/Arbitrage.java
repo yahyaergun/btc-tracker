@@ -1,5 +1,6 @@
 package com.ergun.btc.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.annotation.Id;
 
 import java.text.DecimalFormat;
@@ -19,6 +20,8 @@ public class Arbitrage {
     private Double btcturkProfit;
     private Double koinimProfit;
     private Double paribuProfit;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy hh:mm:ss")
     private Date date;
 
     public Arbitrage(){}

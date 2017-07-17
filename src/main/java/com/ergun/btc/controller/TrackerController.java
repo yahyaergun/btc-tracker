@@ -32,8 +32,8 @@ public class TrackerController {
 
     @RequestMapping("/api")
     public String api(){
+        ObjectMapper mapper = new ObjectMapper();
         try {
-            ObjectMapper mapper = new ObjectMapper();
             Arbitrage arb = trackerService.runTracker();
             return mapper.writeValueAsString(arb);
         } catch (ParseException | IOException e) {
