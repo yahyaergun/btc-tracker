@@ -35,7 +35,7 @@ public class TrackerController {
         ObjectMapper mapper = new ObjectMapper();
         try {
             Arbitrage arb = trackerService.runTracker();
-            return mapper.writeValueAsString(arb);
+            return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(arb);
         } catch (ParseException | IOException e) {
             LOGGER.error("Error on tracker service, details: {}",e);
             throw new RuntimeException(e);
