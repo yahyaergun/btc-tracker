@@ -9,7 +9,7 @@ public interface Constants {
     String BTCTURK_URL = "https://www.btcturk.com/";
     String KOINIM_URL = "https://koinim.com/ticker/";
     String PARIBU_URL = "https://www.paribu.com/endpoint/state";
-    String DOVIZ_URL = "https://kur.doviz.com/api/v1/currencies/USD/latest/yapikredi";
+    String DOVIZ_URL = "https://kur.doviz.com/api/v1/currencies/USD/latest/garanti";
 
     Price YKB_SWIFT_COST = new Price(50.00D, Currency.TRY);
     Double BITSTAMP_BTC_USD_FEE_PERC = 0.0025D; // %0.25
